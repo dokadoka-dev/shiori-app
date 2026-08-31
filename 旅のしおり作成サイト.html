@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>旅のしおりをつくる</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12242B;
+    --teal-deep:#0E3B39;
+    --teal:#1F6F6B;
+    --teal-soft:#E7F1EF;
+    --gold:#D3A24C;
+    --gold-soft:#F3E4C4;
+    --paper:#FFFDF8;
+    --paper-warm:#F6EFE0;
+    --coral:#E1604A;
+    --line:#D8CFBB;
+    --shadow: 0 12px 30px rgba(14,59,57,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper-warm);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.disp{ font-family:'Fraunces',serif; }
+
+  /* ---------- Header / hero ---------- */
+  .hero{
+    background: var(--teal-deep);
+    color:#fff;
+    padding: 48px 24px 64px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0; height:28px;
+    background-image: radial-gradient(circle at 14px 0, var(--paper-warm) 12px, transparent 13px);
+    background-size: 28px 28px;
+    background-repeat: repeat-x;
+  }
+  .hero-inner{ max-width: 760px; margin:0 auto; text-align:center; }
+  .eyebrow-route{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    color: var(--gold); font-size:13px; letter-spacing:.04em; margin-bottom:18px;
+  }
+  .eyebrow-route .dot{ width:5px;height:5px;border-radius:50%;background:var(--gold); }
+  .eyebrow-route .line{ width:40px; height:1px; background:linear-gradient(90deg,var(--gold),transparent); }
+  h1.title{ font-size: 44px; font-weight:600; margin:0 0 12px; line-height:1.25; }
+  .hero p.sub{ font-size:16px; color:#CFEAE6; margin:0; line-height:1.7; }
+
+  /* ---------- Stepper (route line) ---------- */
+  .stepper-wrap{ max-width:760px; margin: -30px auto 0; padding: 0 24px; position:relative; z-index:2; }
+  .stepper{
+    background:var(--paper);
+    border-radius:16px;
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+    display:flex;
+    justify-content:space-between;
+    gap:4px;
+    overflow-x:auto;
+  }
+  .step-btn{
+    background:none; border:none; cursor:pointer; text-align:center;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    padding: 6px 8px; flex:1; min-width:64px;
+    color:#8A8375; font-family:'Inter',sans-serif;
+  }
+  .step-btn .num{
+    width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    border:1.5px solid var(--line); font-size:13px; font-weight:600; color:#8A8375;
+    transition: all .2s ease;
+  }
+  .step-btn .lbl{ font-size:11px; font-weight:600; white-space:nowrap; }
+  .step-btn.active .num{ background:var(--teal); border-color:var(--teal); color:#fff; }
+  .step-btn.active .lbl{ color:var(--teal-deep); }
+  .step-btn.done .num{ background:var(--gold-soft); border-color:var(--gold); color:var(--gold); }
+
+  /* ---------- Main layout ---------- */
+  main{ max-width:760px; margin:0 auto; padding: 28px 24px 100px; }
+  .panel{
+    background:var(--paper);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding: 28px 26px;
+    margin-bottom:20px;
+  }
+  .panel h2{ font-size:24px; margin:0 0 6px; color:var(--teal-deep); }
+  .panel .hint{ font-size:13px; color:#8A8375; margin:0 0 22px; }
+
+  label{ display:block; font-size:13px; font-weight:600; color:var(--teal-deep); margin-bottom:6px; }
+  input[type=text], input[type=number], textarea, select{
+    width:100%; font-family:'Inter',sans-serif; font-size:15px; color:var(--ink);
+    border:1.5px solid var(--line); border-radius:10px; padding:11px 13px; background:#fff;
+    margin-bottom:16px;
+  }
+  input:focus, textarea:focus, select:focus{ outline:none; border-color:var(--teal); }
+  textarea{ resize:vertical; min-height:70px; }
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:520px){ .field-row{ grid-template-columns:1fr; } }
+
+  /* ---------- Day cards ---------- */
+  .day-card{
+    border:1.5px dashed var(--line); border-radius:14px; padding:18px; margin-bottom:18px; background:var(--paper-warm);
+  }
+  .day-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .day-head .day-title{ font-family:'Fraunces',serif; font-size:19px; color:var(--teal-deep); font-weight:600; }
+  .item-row{
+    display:grid; grid-template-columns: 90px 1.4fr 1fr 1fr 32px; gap:8px; margin-bottom:8px; align-items:center;
+  }
+  @media (max-width:640px){ .item-row{ grid-template-columns: 1fr; } }
+  .item-row input{ margin-bottom:0; padding:9px 10px; font-size:14px; }
+
+  /* ---------- Packing checklist ---------- */
+  .pack-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:560px){ .pack-grid{ grid-template-columns:1fr; } }
+  .pack-cat h3{ font-size:16px; margin:0 0 10px; color:var(--teal-deep); font-family:'Inter',sans-serif; font-weight:700; }
+  .pack-item{ display:flex; align-items:center; gap:9px; margin-bottom:9px; font-size:14px; }
+  .pack-item input[type=checkbox]{ width:17px; height:17px; accent-color:var(--teal); margin:0; }
+  .pack-item span{ flex:1; }
+  .pack-item button{ border:none; background:none; color:#B9AF98; cursor:pointer; font-size:14px; }
+  .add-item-row{ display:flex; gap:8px; margin-top:6px; }
+  .add-item-row input{ margin:0; flex:1; padding:8px 10px; font-size:13px; }
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:14px; border-radius:10px; border:none; cursor:pointer;
+    padding:11px 20px; display:inline-flex; align-items:center; gap:8px; transition: transform .12s ease, opacity .12s ease;
+  }
+  .btn:active{ transform: scale(0.97); }
+  .btn-primary{ background:var(--teal); color:#fff; }
+  .btn-primary:hover{ background:var(--teal-deep); }
+  .btn-ghost{ background:transparent; color:var(--teal-deep); border:1.5px solid var(--line); }
+  .btn-ghost:hover{ border-color:var(--teal); }
+  .btn-gold{ background:var(--gold); color:#fff; }
+  .btn-add{ background:var(--teal-soft); color:var(--teal-deep); font-size:13px; padding:9px 14px; }
+  .btn-icon{ background:none; border:none; color:#B9AF98; cursor:pointer; font-size:16px; padding:4px; }
+
+  .nav-buttons{ display:flex; justify-content:space-between; margin-top:6px; }
+
+  /* ---------- Budget ---------- */
+  table.budget{ width:100%; border-collapse:collapse; margin-bottom: 18px;}
+  table.budget th{ text-align:left; font-size:12px; color:#8A8375; font-weight:600; padding:6px 8px; border-bottom:1.5px solid var(--line); }
+  table.budget td{ padding:6px 8px; border-bottom:1px solid #EEE6D6; }
+  table.budget td input{ margin:0; padding:8px; font-size:14px; }
+  table.budget td.label{ font-weight:600; color:var(--teal-deep); font-size:14px; }
+  .total-row td{ font-weight:700; color:var(--coral); border-bottom:none; padding-top:12px; }
+  .split-box{ background:var(--teal-soft); border-radius:12px; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+  .split-box .num{ font-family:'Fraunces',serif; font-size:26px; color:var(--teal-deep); font-weight:600; }
+
+  /* ---------- Preview / printable sheet ---------- */
+  #previewView{ display:none; }
+  .sheet{
+    background:var(--paper); border-radius:18px; box-shadow:var(--shadow); padding:40px 36px; margin-bottom:24px;
+  }
+  .sheet + .sheet{ margin-top: 24px; }
+  .sheet-title{ font-family:'Fraunces',serif; font-size:26px; color:var(--teal-deep); margin:0 0 4px; }
+  .sheet-sub{ font-size:12px; letter-spacing:.06em; color:var(--gold); text-transform:uppercase; margin:0 0 18px; }
+  .sheet hr{ border:none; border-top:1.5px solid var(--line); margin:18px 0; }
+  .kv{ display:grid; grid-template-columns:110px 1fr; gap:8px 14px; font-size:14px; margin-bottom:6px; }
+  .kv b{ color:var(--teal-deep); }
+  .sheet table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  .sheet table th{ background:var(--teal); color:#fff; text-align:left; padding:8px 10px; font-size:12px; }
+  .sheet table td{ padding:8px 10px; border-bottom:1px solid #EEE6D6; }
+  .sheet .day-block{ margin-bottom:22px; }
+  .sheet .day-block h3{ font-family:'Fraunces',serif; background:var(--teal-deep); color:#fff; display:inline-block; padding:4px 16px; border-radius:6px; font-size:16px; margin:0 0 10px; }
+  .check-line{ font-size:14px; margin-bottom:6px; }
+  .memo-text{ white-space:pre-wrap; font-size:14px; line-height:1.9; color:#3B4A48; }
+  .print-bar{ position:sticky; top:0; background:var(--paper-warm); padding:16px 0; z-index:5; display:flex; gap:10px; justify-content:center; margin-bottom: 12px;}
+
+  @media print{
+    .hero, .stepper-wrap, .print-bar, #builderView{ display:none !important; }
+    body{ background:#fff; }
+    #previewView{ display:block !important; }
+    .sheet{ box-shadow:none; border:none; padding:0; margin:0 0 26px; page-break-after: always; }
+    main{ padding:0; max-width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow-route"><span class="line"></span><span class="dot"></span>TRAVEL PLANNER<span class="dot"></span><span class="line"></span></div>
+    <h1 class="title">旅のしおりをつくる</h1>
+    <p class="sub">行き先、日程、持ち物、予算 —— 大切な人との旅を、ひとつのしおりに。</p>
+  </div>
+</div>
+
+<div class="stepper-wrap">
+  <div class="stepper" id="stepper"></div>
+</div>
+
+<main>
+  <div id="builderView"></div>
+
+  <div id="previewView">
+    <div class="print-bar">
+      <button class="btn btn-ghost" onclick="showBuilder()">← 編集にもどる</button>
+      <button class="btn btn-primary" onclick="window.print()">🖨 印刷 / PDF保存</button>
+    </div>
+    <div id="previewContent"></div>
+  </div>
+</main>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+  destination:'', period:'', members:'', theme:'',
+  days:[ blankDay() ],
+  packing: [
+    { title:'貴重品', items:['財布','スマートフォン・充電器','航空券・チケット','パスポート/身分証'].map(n=>({name:n, checked:false})) },
+    { title:'衣類', items:['着替え','羽織もの','パジャマ','靴下・下着'].map(n=>({name:n, checked:false})) },
+    { title:'洗面・衛生用品', items:['歯ブラシセット','スキンケア用品','常備薬','マスク'].map(n=>({name:n, checked:false})) },
+    { title:'電子機器', items:['モバイルバッテリー','カメラ','変換プラグ','充電ケーブル'].map(n=>({name:n, checked:false})) },
+  ],
+  budget: [
+    {label:'交通費', planned:0, actual:0},
+    {label:'宿泊費', planned:0, actual:0},
+    {label:'食費', planned:0, actual:0},
+    {label:'観光・アクティビティ', planned:0, actual:0},
+    {label:'お土産', planned:0, actual:0},
+    {label:'その他', planned:0, actual:0},
+  ],
+  memberCount: 2,
+  memo:'',
+};
+
+function blankDay(){ return { date:'', items:[ blankItem() ] }; }
+function blankItem(){ return { time:'', activity:'', place:'', memo:'' }; }
+
+const steps = [
+  {key:'basic', label:'基本情報'},
+  {key:'itinerary', label:'日程'},
+  {key:'packing', label:'持ち物'},
+  {key:'budget', label:'予算'},
+  {key:'memo', label:'メモ'},
+  {key:'preview', label:'しおり'},
+];
+let current = 0;
+
+// ============================================================
+// STEPPER
+// ============================================================
+function renderStepper(){
+  const wrap = document.getElementById('stepper');
+  wrap.innerHTML = steps.map((s,i)=>`
+    <button class="step-btn ${i===current?'active':i<current?'done':''}" onclick="goStep(${i})">
+      <span class="num">${i+1}</span>
+      <span class="lbl">${s.label}</span>
+    </button>
+  `).join('');
+}
+function goStep(i){
+  current = i;
+  renderStepper();
+  if(steps[i].key === 'preview'){ showPreview(); }
+  else { showBuilder(); renderPanel(); }
+}
+
+// ============================================================
+// BUILDER PANELS
+// ============================================================
+function renderPanel(){
+  const key = steps[current].key;
+  const el = document.getElementById('builderView');
+  if(key==='basic') el.innerHTML = panelBasic();
+  else if(key==='itinerary') el.innerHTML = panelItinerary();
+  else if(key==='packing') el.innerHTML = panelPacking();
+  else if(key==='budget') el.innerHTML = panelBudget();
+  else if(key==='memo') el.innerHTML = panelMemo();
+  attachNav(el);
+}
+
+function attachNav(el){
+  const nav = document.createElement('div');
+  nav.className = 'nav-buttons';
+  nav.innerHTML = `
+    <button class="btn btn-ghost" ${current===0?'disabled style="visibility:hidden"':''} onclick="goStep(${current-1})">← もどる</button>
+    <button class="btn btn-primary" onclick="goStep(${Math.min(current+1, steps.length-1)})">つぎへ →</button>
+  `;
+  el.appendChild(nav);
+}
+
+function panelBasic(){
+  return `
+    <div class="panel">
+      <h2>基本情報</h2>
+      <p class="hint">この旅の基本情報を入力してください。</p>
+      <label>行き先</label>
+      <input type="text" value="${esc(state.destination)}" oninput="state.destination=this.value" placeholder="例：京都・嵐山">
+      <div class="field-row">
+        <div><label>期間</label><input type="text" value="${esc(state.period)}" oninput="state.period=this.value" placeholder="例：2026年11月3日〜4日"></div>
+        <div><label>メンバー</label><input type="text" value="${esc(state.members)}" oninput="state.members=this.value" placeholder="例：自分・パートナー"></div>
+      </div>
+      <label>旅のテーマ・目的</label>
+      <input type="text" value="${esc(state.theme)}" oninput="state.theme=this.value" placeholder="例：紅葉と温泉でリフレッシュ">
+    </div>
+  `;
+}
+
+function panelItinerary(){
+  const dayCards = state.days.map((day, di) => `
+    <div class="day-card">
+      <div class="day-head">
+        <span class="day-title">DAY ${di+1}</span>
+        <div>
+          <input type="text" style="width:170px;display:inline-block;margin:0;padding:7px 10px;font-size:13px;" value="${esc(day.date)}" oninput="state.days[${di}].date=this.value" placeholder="○月○日（○）">
+          ${state.days.length>1 ? `<button class="btn-icon" onclick="removeDay(${di})">✕</button>`:''}
+        </div>
+      </div>
+      ${day.items.map((it,ii)=>`
+        <div class="item-row">
+          <input type="text" placeholder="時間" value="${esc(it.time)}" oninput="state.days[${di}].items[${ii}].time=this.value">
+          <input type="text" placeholder="行程・内容" value="${esc(it.activity)}" oninput="state.days[${di}].items[${ii}].activity=this.value">
+          <input type="text" placeholder="場所/移動手段" value="${esc(it.place)}" oninput="state.days[${di}].items[${ii}].place=this.value">
+          <input type="text" placeholder="メモ" value="${esc(it.memo)}" oninput="state.days[${di}].items[${ii}].memo=this.value">
+          <button class="btn-icon" onclick="removeItem(${di},${ii})">✕</button>
+        </div>
+      `).join('')}
+      <button class="btn btn-add" onclick="addItem(${di})">＋ 予定を追加</button>
+    </div>
+  `).join('');
+
+  return `
+    <div class="panel">
+      <h2>日程</h2>
+      <p class="hint">1日ごとに、時間・行程・場所・メモを書き込みましょう。</p>
+      ${dayCards}
+      <button class="btn btn-gold" onclick="addDay()">＋ 日を追加する</button>
+    </div>
+  `;
+}
+function addDay(){ state.days.push(blankDay()); renderPanel(); }
+function removeDay(i){ state.days.splice(i,1); renderPanel(); }
+function addItem(di){ state.days[di].items.push(blankItem()); renderPanel(); }
+function removeItem(di,ii){ state.days[di].items.splice(ii,1); renderPanel(); }
+
+function panelPacking(){
+  const cats = state.packing.map((cat, ci) => `
+    <div class="pack-cat">
+      <h3>${esc(cat.title)}</h3>
+      ${cat.items.map((it,ii)=>`
+        <div class="pack-item">
+          <input type="checkbox" ${it.checked?'checked':''} onchange="state.packing[${ci}].items[${ii}].checked=this.checked">
+          <span>${esc(it.name)}</span>
+          <button onclick="removePackItem(${ci},${ii})">✕</button>
+        </div>
+      `).join('')}
+      <div class="add-item-row">
+        <input type="text" placeholder="追加する持ち物" id="newitem-${ci}">
+        <button class="btn btn-add" onclick="addPackItem(${ci})">追加</button>
+      </div>
+    </div>
+  `).join('');
+  return `
+    <div class="panel">
+      <h2>持ち物チェックリスト</h2>
+      <p class="hint">チェックしながら忘れ物を防ぎましょう。自由に項目を追加できます。</p>
+      <div class="pack-grid">${cats}</div>
+    </div>
+  `;
+}
+function addPackItem(ci){
+  const inp = document.getElementById('newitem-'+ci);
+  if(inp.value.trim()===''){ return; }
+  state.packing[ci].items.push({name:inp.value.trim(), checked:false});
+  renderPanel();
+}
+function removePackItem(ci,ii){ state.packing[ci].items.splice(ii,1); renderPanel(); }
+
+function panelBudget(){
+  const rows = state.budget.map((b,i)=>`
+    <tr>
+      <td class="label">${esc(b.label)}</td>
+      <td><input type="number" min="0" value="${b.planned}" oninput="state.budget[${i}].planned=Number(this.value)||0; renderPanel();"></td>
+      <td><input type="number" min="0" value="${b.actual}" oninput="state.budget[${i}].actual=Number(this.value)||0; renderPanel();"></td>
+    </tr>
+  `).join('');
+  const totalPlanned = state.budget.reduce((s,b)=>s+b.planned,0);
+  const totalActual = state.budget.reduce((s,b)=>s+b.actual,0);
+  const perPerson = state.memberCount>0 ? Math.round(totalActual/state.memberCount) : 0;
+
+  return `
+    <div class="panel">
+      <h2>予算表</h2>
+      <p class="hint">旅行前に予定額を、帰ったら実際の金額を入力しましょう。</p>
+      <table class="budget">
+        <tr><th>項目</th><th>予定額（円）</th><th>実際の金額（円）</th></tr>
+        ${rows}
+        <tr class="total-row"><td>合計</td><td>${totalPlanned.toLocaleString()}円</td><td>${totalActual.toLocaleString()}円</td></tr>
+      </table>
+      <label>参加人数</label>
+      <input type="number" min="1" style="max-width:120px;" value="${state.memberCount}" oninput="state.memberCount=Number(this.value)||1; renderPanel();">
+      <div class="split-box">
+        <span>実際の合計 ÷ 人数 ＝ 一人あたり</span>
+        <span class="num">${perPerson.toLocaleString()}円</span>
+      </div>
+    </div>
+  `;
+}
+
+function panelMemo(){
+  return `
+    <div class="panel">
+      <h2>旅メモ・思い出</h2>
+      <p class="hint">楽しみにしていること、帰ってきてからの感想など、自由に書き残せます。</p>
+      <textarea rows="10" oninput="state.memo=this.value" placeholder="例：初めて二人で行く海外旅行。美味しいものをたくさん食べたい！">${esc(state.memo)}</textarea>
+    </div>
+  `;
+}
+
+// ============================================================
+// PREVIEW (printable しおり)
+// ============================================================
+function showBuilder(){
+  document.getElementById('builderView').style.display='block';
+  document.getElementById('previewView').style.display='none';
+}
+function showPreview(){
+  document.getElementById('builderView').style.display='none';
+  document.getElementById('previewView').style.display='block';
+  document.getElementById('previewContent').innerHTML = buildPreviewHTML();
+}
+
+function buildPreviewHTML(){
+  const totalActual = state.budget.reduce((s,b)=>s+b.actual,0);
+  const totalPlanned = state.budget.reduce((s,b)=>s+b.planned,0);
+  const perPerson = state.memberCount>0 ? Math.round(totalActual/state.memberCount) : 0;
+
+  const coverSheet = `
+    <div class="sheet" style="text-align:center;">
+      <p class="sheet-sub">TRAVEL PLANNER</p>
+      <h1 style="font-family:'Fraunces',serif;font-size:38px;color:var(--teal-deep);margin:0 0 20px;">旅のしおり</h1>
+      <div style="text-align:left; max-width:420px; margin:0 auto;">
+        <div class="kv"><b>行き先</b><span>${esc(state.destination)||'—'}</span></div>
+        <div class="kv"><b>期間</b><span>${esc(state.period)||'—'}</span></div>
+        <div class="kv"><b>メンバー</b><span>${esc(state.members)||'—'}</span></div>
+        <div class="kv"><b>テーマ</b><span>${esc(state.theme)||'—'}</span></div>
+      </div>
+    </div>
+  `;
+
+  const itineraryBlocks = state.days.map((day,di)=>`
+    <div class="day-block">
+      <h3>DAY ${di+1}　${esc(day.date)}</h3>
+      <table>
+        <tr><th>時間</th><th>行程・内容</th><th>場所/移動手段</th><th>メモ</th></tr>
+        ${day.items.filter(it=>it.time||it.activity||it.place||it.memo).map(it=>`
+          <tr><td>${esc(it.time)}</td><td>${esc(it.activity)}</td><td>${esc(it.place)}</td><td>${esc(it.memo)}</td></tr>
+        `).join('') || '<tr><td colspan="4" style="color:#B9AF98;">（予定未入力）</td></tr>'}
+      </table>
+    </div>
+  `).join('');
+  const itinerarySheet = `<div class="sheet"><p class="sheet-title">日程表</p><p class="sheet-sub">ITINERARY</p>${itineraryBlocks}</div>`;
+
+  const packingSheet = `
+    <div class="sheet">
+      <p class="sheet-title">持ち物チェックリスト</p>
+      <p class="sheet-sub">PACKING LIST</p>
+      <div class="pack-grid">
+        ${state.packing.map(cat=>`
+          <div>
+            <h3 style="font-size:15px;color:var(--teal-deep);margin:0 0 8px;">${esc(cat.title)}</h3>
+            ${cat.items.map(it=>`<div class="check-line">${it.checked?'☑':'☐'} ${esc(it.name)}</div>`).join('')}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  const budgetSheet = `
+    <div class="sheet">
+      <p class="sheet-title">予算表</p>
+      <p class="sheet-sub">BUDGET</p>
+      <table>
+        <tr><th>項目</th><th>予定額</th><th>実際の金額</th></tr>
+        ${state.budget.map(b=>`<tr><td>${esc(b.label)}</td><td>${b.planned.toLocaleString()}円</td><td>${b.actual.toLocaleString()}円</td></tr>`).join('')}
+        <tr style="font-weight:700;color:var(--coral);"><td>合計</td><td>${totalPlanned.toLocaleString()}円</td><td>${totalActual.toLocaleString()}円</td></tr>
+      </table>
+      <hr>
+      <div class="kv"><b>参加人数</b><span>${state.memberCount}人</span></div>
+      <div class="kv"><b>一人あたり</b><span>${perPerson.toLocaleString()}円</span></div>
+    </div>
+  `;
+
+  const memoSheet = `
+    <div class="sheet">
+      <p class="sheet-title">旅メモ・思い出</p>
+      <p class="sheet-sub">MEMORIES</p>
+      <div class="memo-text">${esc(state.memo)||'（メモは未入力です）'}</div>
+    </div>
+  `;
+
+  return coverSheet + itinerarySheet + packingSheet + budgetSheet + memoSheet;
+}
+
+function esc(s){
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderStepper();
+renderPanel();
+</script>
+</body>
+</html>
