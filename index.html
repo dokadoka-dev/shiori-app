@@ -129,6 +129,19 @@
   .add-item-row{ display:flex; gap:8px; margin-top:6px; }
   .add-item-row input{ margin:0; flex:1; padding:8px 10px; font-size:13px; }
 
+  /* ---------- Ad card (affiliate) ---------- */
+  .ad-card{
+    margin-top:24px; padding:18px 20px; border-radius:14px;
+    background: linear-gradient(135deg, var(--teal-soft), var(--gold-soft));
+    border:1px solid var(--gold);
+    position:relative;
+  }
+  .ad-label{
+    display:inline-block; font-size:10px; font-weight:700; letter-spacing:.05em;
+    color:#fff; background:var(--gold); padding:2px 8px; border-radius:5px; margin-bottom:10px;
+  }
+  .ad-copy{ font-size:14px; color:var(--ink); margin:0 0 14px; line-height:1.6; }
+
   /* ---------- Buttons ---------- */
   .btn{
     font-family:'Inter',sans-serif; font-weight:600; font-size:14px; border-radius:10px; border:none; cursor:pointer;
@@ -367,6 +380,12 @@ function panelPacking(){
       <h2>持ち物チェックリスト</h2>
       <p class="hint">チェックしながら忘れ物を防ぎましょう。自由に項目を追加できます。</p>
       <div class="pack-grid">${cats}</div>
+      <div class="ad-card">
+        <span class="ad-label">PR</span>
+        <p class="ad-copy">スーツケード、そろそろ買い替えどきかも？<br>イタリア製の上質なキャリーケース。</p>
+        <a class="btn btn-gold" href="https://px.a8.net/svt/ejp?a8mat=4BC0U9+AI2AOQ+55BE+HUKPU&a8ejpredirect=https%3A%2F%2Fwww.lduvin.jp%2F" target="_blank" rel="noopener nofollow">旅行に、上質なスーツケースを →</a>
+        <img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=4BC0U9+AI2AOQ+55BE+HUKPU" alt="" style="display:none;">
+      </div>
     </div>
   `;
 }
