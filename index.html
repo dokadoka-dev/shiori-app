@@ -30,7 +30,6 @@
   }
   h1,h2,h3,.disp{ font-family:'Fraunces',serif; }
 
-  /* ---------- Header / hero ---------- */
   .hero{
     background: var(--teal-deep);
     color:#fff;
@@ -55,7 +54,6 @@
   h1.title{ font-size: 44px; font-weight:600; margin:0 0 12px; line-height:1.25; }
   .hero p.sub{ font-size:16px; color:#CFEAE6; margin:0; line-height:1.7; }
 
-  /* ---------- Stepper (route line) ---------- */
   .stepper-wrap{ max-width:760px; margin: -30px auto 0; padding: 0 24px; position:relative; z-index:2; }
   .stepper{
     background:var(--paper);
@@ -83,7 +81,6 @@
   .step-btn.active .lbl{ color:var(--teal-deep); }
   .step-btn.done .num{ background:var(--gold-soft); border-color:var(--gold); color:var(--gold); }
 
-  /* ---------- Main layout ---------- */
   main{ max-width:760px; margin:0 auto; padding: 28px 24px 100px; }
   .panel{
     background:var(--paper);
@@ -106,7 +103,6 @@
   .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   @media (max-width:520px){ .field-row{ grid-template-columns:1fr; } }
 
-  /* ---------- Day cards ---------- */
   .day-card{
     border:1.5px dashed var(--line); border-radius:14px; padding:18px; margin-bottom:18px; background:var(--paper-warm);
   }
@@ -118,7 +114,6 @@
   @media (max-width:640px){ .item-row{ grid-template-columns: 1fr; } }
   .item-row input{ margin-bottom:0; padding:9px 10px; font-size:14px; }
 
-  /* ---------- Packing checklist ---------- */
   .pack-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
   @media (max-width:560px){ .pack-grid{ grid-template-columns:1fr; } }
   .pack-cat h3{ font-size:16px; margin:0 0 10px; color:var(--teal-deep); font-family:'Inter',sans-serif; font-weight:700; }
@@ -129,7 +124,6 @@
   .add-item-row{ display:flex; gap:8px; margin-top:6px; }
   .add-item-row input{ margin:0; flex:1; padding:8px 10px; font-size:13px; }
 
-  /* ---------- Ad card (affiliate) ---------- */
   .ad-card{
     margin-top:24px; padding:18px 20px; border-radius:14px;
     background: linear-gradient(135deg, var(--teal-soft), var(--gold-soft));
@@ -142,7 +136,6 @@
   }
   .ad-copy{ font-size:14px; color:var(--ink); margin:0 0 14px; line-height:1.6; }
 
-  /* ---------- Buttons ---------- */
   .btn{
     font-family:'Inter',sans-serif; font-weight:600; font-size:14px; border-radius:10px; border:none; cursor:pointer;
     padding:11px 20px; display:inline-flex; align-items:center; gap:8px; transition: transform .12s ease, opacity .12s ease;
@@ -158,7 +151,6 @@
 
   .nav-buttons{ display:flex; justify-content:space-between; margin-top:6px; }
 
-  /* ---------- Budget ---------- */
   table.budget{ width:100%; border-collapse:collapse; margin-bottom: 18px;}
   table.budget th{ text-align:left; font-size:12px; color:#8A8375; font-weight:600; padding:6px 8px; border-bottom:1.5px solid var(--line); }
   table.budget td{ padding:6px 8px; border-bottom:1px solid #EEE6D6; }
@@ -168,7 +160,6 @@
   .split-box{ background:var(--teal-soft); border-radius:12px; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
   .split-box .num{ font-family:'Fraunces',serif; font-size:26px; color:var(--teal-deep); font-weight:600; }
 
-  /* ---------- Preview / printable sheet ---------- */
   #previewView{ display:none; }
   .sheet{
     background:var(--paper); border-radius:18px; box-shadow:var(--shadow); padding:40px 36px; margin-bottom:24px;
@@ -224,9 +215,6 @@
 </main>
 
 <script>
-// ============================================================
-// STATE
-// ============================================================
 const state = {
   destination:'', period:'', members:'', theme:'',
   days:[ blankDay() ],
@@ -261,9 +249,6 @@ const steps = [
 ];
 let current = 0;
 
-// ============================================================
-// STEPPER
-// ============================================================
 function renderStepper(){
   const wrap = document.getElementById('stepper');
   wrap.innerHTML = steps.map((s,i)=>`
@@ -280,9 +265,6 @@ function goStep(i){
   else { showBuilder(); renderPanel(); }
 }
 
-// ============================================================
-// BUILDER PANELS
-// ============================================================
 function renderPanel(){
   const key = steps[current].key;
   const el = document.getElementById('builderView');
@@ -317,6 +299,15 @@ function panelBasic(){
       </div>
       <label>旅のテーマ・目的</label>
       <input type="text" value="${esc(state.theme)}" oninput="state.theme=this.value" placeholder="例：紅葉と温泉でリフレッシュ">
+      <div class="ad-card" style="text-align:center;">
+        <span class="ad-label">PR</span>
+        <div>
+          <a href="https://px.a8.net/svt/ejp?a8mat=4BCDBO+6YNJ8A+14CS+6C9LD" rel="nofollow noopener" target="_blank">
+            <img border="0" width="120" height="60" alt="" src="https://www24.a8.net/svt/bgt?aid=260917620421&wid=002&eno=01&mid=s00000005230001065000&mc=1">
+          </a>
+          <img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4BCDBO+6YNJ8A+14CS+6C9LD" alt="" style="display:none;">
+        </div>
+      </div>
     </div>
   `;
 }
@@ -438,9 +429,6 @@ function panelMemo(){
   `;
 }
 
-// ============================================================
-// PREVIEW (printable しおり)
-// ============================================================
 function showBuilder(){
   document.getElementById('builderView').style.display='block';
   document.getElementById('previewView').style.display='none';
@@ -527,9 +515,6 @@ function esc(s){
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-// ============================================================
-// INIT
-// ============================================================
 renderStepper();
 renderPanel();
 </script>
